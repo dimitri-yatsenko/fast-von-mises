@@ -5,6 +5,10 @@ __author__ = "Dimitri Yatsenko"
 
 import numpy as np
 
+nwidths = 64  # make a power of two
+widths = np.logspace(0, 1, nwidths, base=30.0)
+
+
 def g(c, w):
     """ von Mises peak """
     return np.exp(-w*(1-c))
@@ -39,10 +43,10 @@ def fit_von_mises2(phi, x):
 
     # binary search for optimal width
     best = None
-    bounds = [0, fit_von_mises2.nwidths]
+    bounds = [0, nwidths]
     while bounds[1]-bounds[0] > 1:
         mid = (bounds[0]+bounds[1])//2
-        candidate = amps(fit_von_mises2.widths[mid])
+        candidate = amps(widths[mid])
         if best is None or best[0]>candidate[0]:
             best = candidate
         bounds[1 if candidate[4]>0 else 0] = mid
@@ -55,5 +59,9 @@ def fit_von_mises2(phi, x):
 
     return (xm-a@gm, a[0], a[1], theta % (2*np.pi), w), r2
 
-fit_von_mises2.nwidths = 64  # make a power of two
-fit_von_mises2.widths = np.logspace(0, 1, fit_von_mises2.nwidths, base=30.0)
+
+def bootstrap_von_mises2(phi, x, shuffles=5000):
+    v, r2 = fit_von_mises2(phi, x)
+    return v, r2, np.array([fit_von_mises2(phi, np.random.choice(x, x.shape))[1] < r2 
+                            for shuffle in range(shuffles)]).mean() + 0.5/shuffles
+    

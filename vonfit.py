@@ -20,7 +20,7 @@ def fit_von_mises2(phi, x):
     """
     :input phi: 1D vector of equidistally distributed angles between 0 and 2*pi
     :input x:  1D vector of response magnitudes at those angles
-    :output: v, r2 - where w are the fitted coefficients and r2 is squared error
+    :output: v, r2 - where v is the list of the fitted coefficients and r2 is squared error
     """
     # estimate theta with two-cosine fit
     s = x @ np.exp(2j*phi)

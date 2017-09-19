@@ -5,13 +5,13 @@ __author__ = "Dimitri Yatsenko"
 
 import numpy as np
 
-# von Mises peak
 def g(c, w):
+    """ von Mises peak """
     return np.exp(-w*(1-c))
 
 
-# two-peak von Mises
 def von_mises2(phi, a0, a1, a2, theta, w):
+    """ two-peak von Mises """
     c = np.cos(phi-theta)
     return a0 + a1 * g(c, w) + a2 * g(-c,w)
 

@@ -5,8 +5,10 @@ __author__ = "Dimitri Yatsenko"
 
 import numpy as np
 
+# by "width", we really mean "sharpness" with higher values corresponding to narrower peaks.
 nwidths = 64  # make a power of two
-widths = np.logspace(0, 1, nwidths, base=30.0)
+max_width = 30.0
+widths = np.logspace(0, 1, nwidths, base=max_width)
 
 
 def g(c, w):
@@ -66,6 +68,5 @@ def fit_von_mises2(phi, x):
 
 def bootstrap_von_mises2(phi, x, shuffles=5000):
     v, r2 = fit_von_mises2(phi, x)
-    return v, r2, np.array([fit_von_mises2(phi, x[np.random.permutation(x.shape[0])])[1] < r2
-                            for shuffle in range(shuffles)]).mean() + 0.5/shuffles
-
+    return v, r2, (sum(fit_von_mises2(phi, x[np.random.permutation(x.shape[0])])[1] < r2
+        for shuffle in range(shuffles)) + 0.5)/shuffles

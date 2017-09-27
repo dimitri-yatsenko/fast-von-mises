@@ -68,5 +68,5 @@ def fit_von_mises2(phi, x):
 
 def bootstrap_von_mises2(phi, x, shuffles=5000):
     v, r2 = fit_von_mises2(phi, x)
-    return v, r2, (sum(fit_von_mises2(phi, x[np.random.permutation(x.shape[0])])[1] < r2
-        for shuffle in range(shuffles)) + 0.5)/shuffles
+    return v, r2, sum((fit_von_mises2(phi, x[np.random.permutation(x.shape[0])])[1] < r2
+        for shuffle in range(shuffles)), 0.5)/shuffles

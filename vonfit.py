@@ -4,6 +4,8 @@ Fast two-peak von Mises fit
 __author__ = "Dimitri Yatsenko"
 
 import numpy as np
+import scipy.stats
+from IPython.core.debugger import set_trace
 
 nwidths = 64  # make a power of two
 widths = np.logspace(0, 1, nwidths, base=30.0)
@@ -26,8 +28,12 @@ def fit_von_mises2(phi, x):
     :input x:  1D vector of response magnitudes at those angles
     :output: v, r2 - where v is the list of the fitted coefficients and r2 is squared error
     """
+    assert x.ndim==1 and phi.ndim==1, 'data must be in 1D vectors'
+    angles, idx, counts = np.unique(phi, return_counts=True, return_inverse=True)
+    assert all(abs(np.diff(angles)-2*np.pi/angles.shape[0])<1e-6), 'non-uniform angles'
+
     # estimate theta with two-cosine fit
-    s = x @ np.exp(2j*phi)
+    s = x/counts[idx] @ np.exp(2j*phi)
     theta = 0.5*np.angle(s)
     xm = x.mean()
     x = x - xm
@@ -60,8 +66,8 @@ def fit_von_mises2(phi, x):
     return (xm-a@gm, a[0], a[1], theta % (2*np.pi), w), r2
 
 
-def bootstrap_von_mises2(phi, x, shuffles=5000):
+def bootstrap_von_mises2(phi, x, shuffles=5000):    
     v, r2 = fit_von_mises2(phi, x)
-    return v, r2, np.array([fit_von_mises2(phi, np.random.choice(x, x.shape))[1] < r2 
+    return v, r2, np.array([fit_von_mises2(phi, x[np.random.permutation(x.shape[0])])[1] < r2 
                             for shuffle in range(shuffles)]).mean() + 0.5/shuffles
     

@@ -4,8 +4,6 @@ Fast two-peak von Mises fit
 __author__ = "Dimitri Yatsenko"
 
 import numpy as np
-import scipy.stats
-from IPython.core.debugger import set_trace
 
 nwidths = 64  # make a power of two
 widths = np.logspace(0, 1, nwidths, base=30.0)
@@ -66,8 +64,8 @@ def fit_von_mises2(phi, x):
     return (xm-a@gm, a[0], a[1], theta % (2*np.pi), w), r2
 
 
-def bootstrap_von_mises2(phi, x, shuffles=5000):    
+def bootstrap_von_mises2(phi, x, shuffles=5000):
     v, r2 = fit_von_mises2(phi, x)
-    return v, r2, np.array([fit_von_mises2(phi, x[np.random.permutation(x.shape[0])])[1] < r2 
+    return v, r2, np.array([fit_von_mises2(phi, x[np.random.permutation(x.shape[0])])[1] < r2
                             for shuffle in range(shuffles)]).mean() + 0.5/shuffles
-    
+
